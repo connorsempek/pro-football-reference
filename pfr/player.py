@@ -144,6 +144,8 @@ class Player(object):
 		return df
 
 
+	def get_
+
 
 
 
