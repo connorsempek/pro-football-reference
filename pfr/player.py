@@ -4,7 +4,8 @@
 #------------------------------------------------------------------------------
 # TODO: 
 #
-#	1. Add methods for 
+#	* Get individual-play-level data
+#	* Add search ability by hitting pulled player data
 #   
 ###############################################################################
 
@@ -16,6 +17,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+
+from get_tables import *
 
 #------------------------------------------------------------------------------
 # Player class
@@ -30,15 +33,15 @@ class Player(object):
 		self.url = self.base + self.player_endpoint 
 
 		self.page = self._get_page()
-		self.bio = self._get_bio() # leave out?
+		self.bio = self._get_bio()
 
-		# columns for gamelog data
-		self.gamelog_columns = [
-			'year', 'date', 'game', 'age', 'team', 'opp', 'result', 'rush', 
-			'rush_yds', 'yds_per_rush', 'rush_tds', 'rec_tgt', 'rec', 
-			'rec_yds', 'yds_per_rec', 'rec_tds', 'rec_pct', 'yds_per_tgt',
-			'ret', 'ret_yds', 'yds_per_ret', 'ret_tds', 'tds', 'points'
-			]
+		self.paths = {
+			'home'       : '/', 
+			'gamelog'    : '/gamelog', 
+			'splits'     : '/splits', 
+			'penalties'  : '/penalties', 
+			'touchdowns' : '/touchdowns',
+			}
 
 
 	def _get_page(self):
@@ -109,43 +112,37 @@ class Player(object):
 		return bio_data
 
 
+	def get_path_tables(self, path):
+		'''method to get all tables for some path to a player page
+		'''
+
+		path_url = self.url + path
+		return get_stats_tables(path_url)
+
+
 	def get_gamelog(self):
 		'''gets gamelog data for player
 		'''
+		self.gamelog = self.get_path_tables(self.paths['gamelog'])
+	
 
-		resp = requests.get(self.url + '/gamelog')
-		page = BeautifulSoup(resp.text)
-		tbl = page.find_all('table')[0]
-		rows = tbl.find_all('tr')[1:-1]
-		gamelog = []
-		for row in rows[1:]:
-			if row.attrs:
-				if row.has_attr('id'):	
-					vals = [td.get_text() for td in row.find_all('td')]
-					if vals:
-						gamelog.append(vals)
-		df = pd.DataFrame(gamelog)
-		
-		# drop axis containing only '@'
-		df.drop(5, axis=1, inplace=True)
-
-		# set columns to unique, descriptive names
-		df.columns = self.gamelog_columns
-
-		# replace empty strings with 0
-		df.replace('', 0, inplace=True)
-
-		# remove percent symbol
-		df.loc[:, 'rec_pct'] = df.loc[:, 'rec_pct'].str.replace('%', '')
-		
-		# make columns that should be numeric numeric
-		num_cols = self.gamelog_columns[7:]
-		df[num_cols] = df[num_cols].astype(float) 
-		return df
+	def get_penalties(self):		
+		'''gets penalty data for player
+		'''
+		penalties_url = self.url + self.paths['penalties']
+		self.penalties = get_stats_tables(penalties_url)
 
 
-	def get_
+	def get_splits(self):		
+		'''gets split data for player
+		'''
+		split_url = self.url + self.paths['splits']
+		self.splits = get_stats_tables(splits_url)
 
 
-
+	def get_touchdowns(self):
+		'''gets touchdown data for player
+		'''
+		tds_url = self.url + self.paths['touchdowns']
+		self.tds = get_stats_tables(tds_url)
 
