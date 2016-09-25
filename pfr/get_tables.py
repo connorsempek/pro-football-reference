@@ -61,6 +61,10 @@ def is_data_row(row, table_id):
 	is_data_row = False
 	if row.has_attr('id'):
 		is_data_row = table_id in row.attrs['id']
+	# !!! TODO: second condition is gross, clean up
+	elif not row.attrs:
+		if row.find_all('td'):
+			is_data_row = True
 	return is_data_row
 
 
@@ -93,30 +97,20 @@ def get_stats_tables(page):
 
 
 
-########################################################################
+#------------------------------------------------------------------------------
 # testing
 
-base = 'http://www.pro-football-reference.com/players/H/HydeCa00.htm'
-resp = requests.get(base)
-page = BeautifulSoup(resp.text)
-tables = get_stats_tables(page)
+if __name__ == '__main__':
 
-########################################################################
-
-
-endpoints = ['', 'gamelog', 'splits', 'penalties', 'touchdowns']
-every_table = {}
-for endpoint in endpoints:
-
-	url = '{}/{}'.format(base, endpoint)
-	resp = requests.get(url)
+	base = 'http://www.pro-football-reference.com/players/H/HydeCa00.htm'
+	resp = requests.get(base)
 	page = BeautifulSoup(resp.text)
-	page_tables = {endpoint: parse_page_tables(page)}
-	every_table.update(page_tables)
+	tables = get_stats_tables(page)
 
-
-
-
-
+	path = '/touchdowns'
+	path_url = base.replace('.htm', path)
+	path_resp = requests.get(path_url)
+	path_page = BeautifulSoup(path_resp.text)
+	path_tables = get_stats_tables(path_page)
 
 

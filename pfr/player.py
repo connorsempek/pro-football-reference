@@ -116,33 +116,37 @@ class Player(object):
 		'''method to get all tables for some path to a player page
 		'''
 
-		path_url = self.url + path
+		path_url = self.url.replace('.htm', path)
 		return get_stats_tables(path_url)
 
 
 	def get_gamelog(self):
 		'''gets gamelog data for player
 		'''
-		self.gamelog = self.get_path_tables(self.paths['gamelog'])
+
+		path = self.paths['gamelog']
+		self.gamelog = self.get_path_tables(path)
 	
 
 	def get_penalties(self):		
 		'''gets penalty data for player
 		'''
-		penalties_url = self.url + self.paths['penalties']
-		self.penalties = get_stats_tables(penalties_url)
+
+		path = self.paths['penalties']
+		self.penalties = self.get_path_tables(path)
 
 
 	def get_splits(self):		
 		'''gets split data for player
 		'''
-		split_url = self.url + self.paths['splits']
-		self.splits = get_stats_tables(splits_url)
+		
+		path = self.paths['splits']
+		self.splits = get_stats_tables(path)
 
 
 	def get_touchdowns(self):
 		'''gets touchdown data for player
 		'''
-		tds_url = self.url + self.paths['touchdowns']
-		self.tds = get_stats_tables(tds_url)
+		path = self.paths['touchdowns']
+		self.tds = get_stats_tables(path)
 
