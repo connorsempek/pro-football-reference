@@ -143,12 +143,12 @@ class Player(object):
 		'''
 		
 		path = self.paths['splits']
-		self.splits = get_path_tables(path)
+		self.splits = self.get_path_tables(path)
 
 
 	def get_touchdowns(self):
 		'''gets touchdown data for player
 		'''
 		path = self.paths['touchdowns']
-		self.tds = get_path_tables(path)
+		self.tds = self.get_path_tables(path)
 
