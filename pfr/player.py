@@ -117,7 +117,9 @@ class Player(object):
 		'''
 
 		path_url = self.url.replace('.htm', path)
-		return get_stats_tables(path_url)
+		resp = requests.get(path_url)
+		page = BeautifulSoup(resp.text)
+		return get_stats_tables(page)
 
 
 	def get_gamelog(self):
