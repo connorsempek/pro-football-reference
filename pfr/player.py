@@ -74,8 +74,8 @@ class Player(object):
 
 		# player birth time and place
 		dob = txt['Born'].split('\n')[0].replace(u'\xa0', u' ')
-		birth_state = txt['Born'].split('in')[-1].split(',')[0].strip()
-		birth_city = txt['Born'].split('in')[-1].split(',')[-1].strip()
+		birth_city = txt['Born'].split('in')[-1].split(',')[0].strip()
+		birth_state = txt['Born'].split('in')[-1].split(',')[-1].strip()
 
 		# NFL draft round, overall pick, and year
 		draft = txt['Draft']
@@ -117,6 +117,7 @@ class Player(object):
 		'''
 
 		path_url = self.url.replace('.htm', path)
+		print path_url
 		resp = requests.get(path_url)
 		page = BeautifulSoup(resp.text)
 		return get_stats_tables(page)
@@ -151,4 +152,38 @@ class Player(object):
 		'''
 		path = self.paths['touchdowns']
 		self.tds = self.get_path_tables(path)
+
+
+	def get_play_paths(self):
+
+		div = self.page.find_all('div', {'id':'inner_nav'})[0]
+		anchors = div.find_all('a', href=True)
+		paths = list(set([a['href'] for a in anchors]))
+		return [p for p in paths if 'plays' in p] 
+
+
+	def get_plays(self):
+		
+		paths = self.get_play_paths()
+		paths = ['/' + '/'.join(p.split('/')[4:]) for p in paths]
+		plays = []
+		for path in paths: 
+			plays.append(self.get_path_tables(path))
+		return plays
+
+
+
+
+
+if __name__ == '__main__':
+
+	from player import *
+	import pandas as pd
+	p = Player('/players/H/HydeCa00.htm')
+	paths = p.get_play_paths()
+	plays = p.get_plays()
+
+	'/players/H/HydeCa00/receiving-plays/2014/'
+
+
 
