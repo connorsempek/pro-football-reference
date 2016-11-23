@@ -5,7 +5,6 @@
 # TODO: 
 #
 #	* Get individual-play-level data
-#	* Add search ability by hitting pulled player data
 #   
 ###############################################################################
 
@@ -117,7 +116,6 @@ class Player(object):
 		'''
 
 		path_url = self.url.replace('.htm', path)
-		print path_url
 		resp = requests.get(path_url)
 		page = BeautifulSoup(resp.text)
 		return get_stats_tables(page)
@@ -167,12 +165,15 @@ class Player(object):
 		paths = self.get_play_paths()
 		paths = ['/' + '/'.join(p.split('/')[4:]) for p in paths]
 		plays = []
-		for path in paths: 
-			plays.append(self.get_path_tables(path))
+		for path in paths:
+			year = path.split('/')[-2]
+			play_dict = self.get_path_tables(path)
+			for k, df in play_dict.items():
+				df['year'] = year
+			plays.append(play_dict)
+		plays = {key: pd.concat([play_dict[key] for play_dict in plays]) 
+			for key in plays[0].keys()}
 		return plays
-
-
-
 
 
 if __name__ == '__main__':
@@ -182,8 +183,4 @@ if __name__ == '__main__':
 	p = Player('/players/H/HydeCa00.htm')
 	paths = p.get_play_paths()
 	plays = p.get_plays()
-
-	'/players/H/HydeCa00/receiving-plays/2014/'
-
-
 
