@@ -16,8 +16,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
-from get_tables import *
+import get_tables as tbls
 
 #------------------------------------------------------------------------------
 # Player class
@@ -118,7 +117,7 @@ class Player(object):
 		path_url = self.url.replace('.htm', path)
 		resp = requests.get(path_url)
 		page = BeautifulSoup(resp.text)
-		return get_stats_tables(page)
+		return tbls.get_stats_tables(page)
 
 
 	def get_gamelog(self):
@@ -176,11 +175,24 @@ class Player(object):
 		return plays
 
 
+
 if __name__ == '__main__':
 
 	from player import *
 	import pandas as pd
-	p = Player('/players/H/HydeCa00.htm')
-	paths = p.get_play_paths()
-	plays = p.get_plays()
+
+	hyde = Player('/players/H/HydeCa00.htm')
+	paths = hyde.get_play_paths()
+	hyde_plays = hyde.get_plays()['all_plays']
+
+	kaep = Player('/players/K/KaepCo00.htm')
+	paths = kaep.get_play_paths()
+	kaep_plays = kaep.get_plays()['all_plays']
+
+	bowman = Player('/players/B/BowmNa99.htm')
+	paths = bowman.get_play_paths()
+	bowman_plays = bowman.get_plays()['all_plays']
+
+
+
 
