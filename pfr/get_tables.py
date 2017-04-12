@@ -1,5 +1,6 @@
 # tools for parsing out tables on pfr pages
 
+import sys
 import re
 import requests
 from bs4 import BeautifulSoup, Comment
@@ -10,7 +11,7 @@ import pandas as pd
 def uncomment(comment):
 	'''uncomment beautiful soup comment
 	'''
-	return BeautifulSoup(comment.extract())
+	return BeautifulSoup(comment.extract(), "lxml")
 
 
 def get_comments(page):
@@ -70,10 +71,14 @@ def is_data_row(row, table_id):
 
 def get_stats_row_data(row):
 
-	ths = row.find_all('th')
-	tds = row.find_all('td')
-	data = ths + tds
-	return {d.attrs['data-stat']: d.get_text() for d in data}
+	try:	
+		ths = row.find_all('th')
+		tds = row.find_all('td')
+		data = ths + tds
+		return {d.attrs['data-stat']: d.get_text() for d in data}
+	except KeyError:
+		sys.stdout.write('Bad row\n')
+		return None
 
 
 def get_stats_table_data(table):
